@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+$(document).ready(function() {
+	//console.log("ds");
+$.ajax({
+ url: "http://www.mqtest.cf:4000",
+ data:"dummy",
+ type:'POST',
+ crossDomain:true,
+ error: function (xhr, status, error) {
+ 			console.log(xhr.responseText);
+ 			console.log(status);
+           console.log('Error: ' + error.message);
+
+       }
+}).done(function(data){
+console.log("success");
+console.log(data);
+});
+});
+</script>
+</head>
+<body>
+
+
+
+</body>
+</html>

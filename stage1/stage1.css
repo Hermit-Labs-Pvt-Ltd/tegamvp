@@ -1,0 +1,42 @@
+
+.screen{
+	position:relative;
+	display:flex;
+	width:220px;
+	height:220px;
+	border:2px solid;
+	flex-wrap:wrap;
+	margin:106px;
+}
+
+.cell{
+	position: relative;
+	width:40px;
+	height:40px;
+	border:2px solid;	
+}
+
+.cell_input{
+	width:100%;
+	height:100%;
+	cursor:pointer;
+	font-size:1.2em;
+	text-align:center;
+}
+
+.nomenclature{
+	position:absolute;
+	width:100%;
+	font-size:1.2em;;
+	
+}
+
+.nomen_top{
+	top:-30px;
+	text-align:center;
+}
+.nomen_left{
+	line-height:2;
+	left:-30px;
+}
+
