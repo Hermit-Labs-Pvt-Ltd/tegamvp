@@ -1,51 +1,8 @@
-var panel_id, cell_id,info;
-$( ".cell_input" ).on( "click", function() {
-  $(this).css( "cursor", "text");
-console.log($(this).attr("id"));
-});
-
-$( ".cell_input" ).on( "focusout", function() {		
-	cell_id=$(this).attr("id").substring(5);
-	panel_id = $(this).val();
-	if (window.confirm("You have assigned the id " + panel_id + " to cell " + cell_id + ". Confirm?")) {
-    var data = {
-    	panel_id:panel_id,
-    	cell_id:cell_id
-    }
-
-    info = JSON.stringify(data);
-    console.log(info);
-	$.ajax({
- url: "http://www.mqtest.cf:4000",
- contentType: "application/json",
- data:info,
- type:'POST',
- crossDomain:true,
- error: function (xhr, status, error) {
- 			console.log(xhr.responseText);
- 			console.log(status);
-           	console.log('Error: ' + error.message);
-       }
-}).done(function(data){
-console.log("success");
-console.log(data);
-})
-.fail(function(data){
-	console.log("some error occured");
-});	
-
-	console.log($(this).val());
- //	$(this).css('background-color','green');	
-	}
-	else{
-		$(this).val("");
-	}
-});
-
+var panel_id, cell_id,info,ws;
 
 //Websocket Client configuration
 
-	    var ws;
+	    
 	    //Starting of the websocket function
 		function startsocket(){
 		ws = new WebSocket("wss://www.mqtest.cf:3000");//Address of the socket server
@@ -66,3 +23,53 @@ console.log(data);
 
 		}; }
 		startsocket();//Calling the Socket Client function
+
+
+$( ".cell_input" ).on( "click", function() {
+  $(this).css( "cursor", "text");
+console.log($(this).attr("id"));
+});
+
+$( ".cell_input" ).on( "focusout", function() {		
+	cell_id=$(this).attr("id").substring(5);
+	panel_id = $(this).val();
+	if (window.confirm("You have assigned the id " + panel_id + " to cell " + cell_id + ". Confirm?")) {
+    var data = {
+    	panel_id:panel_id,
+    	cell_id:cell_id
+    }
+
+    info = JSON.stringify(data);
+    console.log(info);
+
+	$.ajax({
+ url: "http://www.mqtest.cf:4000",
+ contentType: "application/json",
+ data:info,
+ type:'POST',
+ crossDomain:true,
+ error: function (xhr, status, error) {
+ 			console.log(xhr.responseText);
+ 			console.log(status);
+           	console.log('Error: ' + error.message);
+       }
+}).done(function(data){
+console.log("success");
+console.log(data);
+//Sending the collected data about panel downwards back to the socket server
+ws.send(info);
+})
+.fail(function(data){
+	console.log("some error occured");
+});	
+
+	console.log($(this).val());
+ //	$(this).css('background-color','green');	
+	}
+	else{
+		$(this).val("");
+	}
+});
+
+
+

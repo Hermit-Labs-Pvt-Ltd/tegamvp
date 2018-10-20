@@ -104,11 +104,11 @@ clients.send();
 //On Connection with Socket Server
 wss.on("connection",function(ws) {
  ws.send("Welcome Hermit Broker");
+  //Fetching messages from client side 
+  ws.on("message",(data)=>{
+  console.log(data);
+ });
 });
-
-
-
-
 
 //Port 3000 for Websocket
 server.listen(3000,()=>{
