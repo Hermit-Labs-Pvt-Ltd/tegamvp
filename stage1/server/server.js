@@ -93,12 +93,14 @@ client.on('connect', function () {
 //On receiving message from the MQTT Broker
 client.on('message',function(topic,message) {
 	
-});
-
 //Sending Message to Each of the subscribed clients on WebSockets
 wss.clients.forEach(function(clients) {
-clients.send();
+clients.send(message.toString());
 });
+
+});
+
+
 
 
 //On Connection with Socket Server
@@ -107,7 +109,9 @@ wss.on("connection",function(ws) {
   //Fetching messages from client side 
   ws.on("message",(data)=>{
   console.log(data);
+  client.publish("hello/cat",data);
  });
+
 });
 
 //Port 3000 for Websocket
