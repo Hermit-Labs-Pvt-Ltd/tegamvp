@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<body>
+
+<h2>HTML Forms</h2>
+
+<form id="target">
+  Table Info:<br>
+  <input type="text"  id = "tinfo">
+  <br>
+  Table Rows:<br>
+  <input type="text"  id = "trow" >
+  <br>
+  Table Columns:<br>
+  <input type="text"  id = "tcol">
+  <br>
+  No of Repeaters:<br>
+  <input type="text"  id = "norep" >
+  <br>
+  Client ID:<br>
+  <input type="text"  id = "clid">
+  <br>
+  <br>
+  <input type="submit" value="Submit">
+
+</form> 
+
+
+
+</body>
+<script type="text/javascript">
+
+	
+  	$( "#target" ).submit(function( event ) {
+  		var tab_row = $("#trow").val();
+  		var tab_col = $("#tcol").val();
+      var tab_info = $("#tinfo").val();
+      var cl_id = $("#clid").val();
+      var rep_no = $("#norep").val();
+  		var info = {
+  		 tab_row,tab_col,tab_info,cl_id,rep_no
+  		}
+  		info = JSON.stringify(info);
+      console.log(info);
+  // alert( "Handler for .submit() called.  " + cnam +"  "+cinfo);
+  	$.ajax({
+ url: "http://www.mqtest.cf:4000/newtable",
+ contentType: "application/json",
+ data:info,
+ type:'POST',
+ crossDomain:true,
+ error: function (xhr, status, error) {
+ 			console.log(xhr.responseText);
+ 			console.log(status);
+           	console.log('Error: ' + error.message);
+       }
+}).done(function(data){
+console.log("success");
+console.log(data);
+//Sending the collected data about panel downwards back to the socket server
+ws.send(serv);
+})
+.fail(function(data){
+	console.log("some error occured");
+});	
+});
+
+
+
+</script>
+
+</html>

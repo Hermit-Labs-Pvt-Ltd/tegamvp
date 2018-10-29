@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<body>
+
+<h2>HTML Forms</h2>
+
+<form id="target">
+  Client Name:<br>
+  <input type="text"  id = "cnam">
+  <br>
+  Client Info:<br>
+  <input type="text"  id = "cinfo" >
+  <br>
+  <br>
+  <input type="submit" value="Submit">
+
+</form> 
+
+
+
+</body>
+<script type="text/javascript">
+
+	
+  	$( "#target" ).submit(function( event ) {
+  		var cnam = $("#cnam").val();
+  		var cinfo = $("#cinfo").val();
+  		var info = {
+  			cl_nam : cnam,
+  			cl_info : cinfo
+  		}
+  		info = JSON.stringify(info);
+  alert( "Handler for .submit() called.  " + cnam +"  "+cinfo);
+  	$.ajax({
+ url: "http://www.mqtest.cf:4000/newclient",
+ contentType: "application/json",
+ data:info,
+ type:'POST',
+ crossDomain:true,
+ error: function (xhr, status, error) {
+ 			console.log(xhr.responseText);
+ 			console.log(status);
+           	console.log('Error: ' + error.message);
+       }
+}).done(function(data){
+console.log("success");
+console.log(data);
+})
+.fail(function(data){
+	console.log("some error occured" + JSON.stringify(data));
+});
+// //Sending the collected data about panel downwards back to the socket server
+// ws.send(serv);
+});
+
+
+
+</script>
+
+</html>

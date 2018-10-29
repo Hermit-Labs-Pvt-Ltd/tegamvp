@@ -7,22 +7,11 @@ const bodyParser = require('body-parser');//Requiring the Body Parser Module
 
 //Requiring Files from local Directories
 var {mongoose} = require('./db/mongoose.js'); //Mongoose Configuration File
-var {client} = require('./db/models/client.js');
+var {tegaclient} = require('./db/models/client.js');
 var {table} = require('./db/models/table.js');
 var {modules} = require('./db/models/modules.js');
 
-//Creating a log for maintaining all the server requests
 var app = express();
-app.use((req,res,next)=>{
- var now = new Date().toString();
- var log =`${now}: ${req.method} ${req.url}`;
- fs.appendFile('server.log',log+'\n',(err)=>{
-  if(err){
-    console.log('Unable to append server.log.');
-  }
- });
- next();
-});
 
 //Body Parser setup with express to parse the JSON body sent by the frontend
 app.use(bodyParser.json());
@@ -38,7 +27,20 @@ app.use(function(req, res, next) {
 
 });
 
-//Setting up the POST routes 
+//Creating a log for maintaining all the server requests
+app.use((req,res,next)=>{
+ var now = new Date().toString();
+ var log =`${now}: ${req.method} ${req.url}`;
+ fs.appendFile('server.log',log+'\n',(err)=>{
+  if(err){
+    console.log('Unable to append server.log.');
+  }
+ });
+ next();
+});
+
+
+//Setting up the POST routes for the addition of module
 app.post('/',(req,res)=>{
 
 console.log(req.body.cell_id);
@@ -57,11 +59,114 @@ module_no:req.body.panel_id
 add_module.save().then((doc)=>{
 res.send("200");
 },(e)=>{
-	res.status(400).send(e);
+	res.send(400).send(e);
 });
 
 console.log(req.body);
 });
+
+
+//POST route for the addition of new client 
+app.post('/newclient',(req,res)=>{
+//Query to count the number of clients which are already present in the system 
+tegaclient.countDocuments((err,count)=>{
+//If it's the first client give him the first id  
+  if(count == 0){
+    req.body.cl_id = 1;
+  }
+  else //iterate the number of modules already present and give him the id
+    req.body.cl_id = count + 1;
+
+//For saving the new client , instantiating the module
+  var new_client = new tegaclient(req.body);
+
+  //Saving the new instance in the database 
+  new_client.save().then((doc)=>{
+  res.send("200");//Sending a ok respnse back to the requesting 
+  });
+
+}).catch((err)=>{
+  res.send(err);
+});
+ 
+});
+
+//POST Route for the creation of a new table 
+app.post('/newtable',(req,res)=>{
+
+ //Finding the associated client id from the front-end and finding the actual object id associated with it and then finding the number of tables  which have the same OBID and then accordingly allocating the table with a id
+
+//Finding the OBID of the given client id
+ tegaclient.findOne({'cl_id': req.body.cl_id},'_id').then((id)=>{
+ 	req.body.cl_id = id;
+    // console.log(req.body);
+    return req.body;
+ 
+ }).then(()=>{ //Fiding the number of tables which are already present or the particular client
+
+    table.countDocuments({cl_id : req.body.cl_id},(err,count)=>{
+ 	// console.log(req.body);
+
+   if(count == 0 || count == null || !count){
+    req.body.tab_id = 1;
+  }
+
+  else{
+    req.body.tab_id = count + 1;
+  }
+
+  // res.send(req.body);
+//Creating an instance of the new table that is to be saved 
+  var new_table = new table(req.body);
+  // Saving the new table into the database
+  new_table.save().then((doc)=>{
+   res.send("200");//Sending back the status code of ok
+  });
+
+   });
+
+ }).catch((err)=>{
+
+   console.log(err);
+
+ });
+
+
+ });
+
+
+//POST Route for the addition of a new module into the system
+app.post('/newmodule',(req,res)=>{
+
+//Query for finding out the OBID of the client id which is provided at the fromt end 
+ tegaclient.findOne({'cl_id': req.body.cl_id},'_id').then((id)=>{
+ 	req.body.cl_id = id;
+    return req.body;
+
+ }).then(()=>{
+ 	//Query for finding out the OBID of the table which has the client attached t it
+ 	table.findOne({'cl_id':req.body.cl_id , 'tab_id':req.body.tab_id},'_id').then((id)=>{
+ 		req.body.tb_id = id;
+ 		//Instantiating a new module which has the properties of the new module
+ 		var add_module = new modules({
+          pos:req.body.pos,
+          tb_id:req.body.tb_id,
+          module_id:req.body.module_id
+ 	});
+ 		//saving the new module in the database
+ 		add_module.save().then((doc)=>{
+ 			res.send(doc);
+ 		});
+ }).catch((err)=>{
+ 	console.log("Error is "+err);
+ });
+});
+// console.log(req.body);
+});
+ 
+
+
+
 
 //GET route configuration
 app.get('/',(req,res)=>{
@@ -86,16 +191,29 @@ console.log("Socket server started");
 
 //On Connection with MQTT Topic
 client.on('connect', function () {
-  client.subscribe('hello/cat');
+  client.subscribe('#');
   console.log('client has subscribed successfully to the MQTT topic');
 });
+
+
+
 
 //On receiving message from the MQTT Broker
 client.on('message',function(topic,message) {
 	
+//console.log(topic);
+
+var temp = message.toString();
+
+if (temp.status == "200"){
+  console.log("Panel has been installed successfully");
+}
 //Sending Message to Each of the subscribed clients on WebSockets
 wss.clients.forEach(function(clients) {
+  if(topic == "panelchecking"){
 clients.send(message.toString());
+// console.log(message.toString + now);
+}
 });
 
 });

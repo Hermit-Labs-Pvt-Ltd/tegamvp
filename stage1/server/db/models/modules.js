@@ -1,10 +1,13 @@
 const mongoose = require('mongoose');
-var modules = mongoose.model('modules',{
+var {Schema} = require('mongoose');
+
+var ModuleSchema = new Schema({
 tb_id:{
- 	type:String,
+ 	type:Schema.Types.ObjectId,
  	required:true,
  	trim:true,
  	minlength:1,
+ 	ref:'table'
  },
  modules_info:{
  	type:String,
@@ -35,7 +38,7 @@ tb_id:{
  	type:String,
  	minlength:1
 },
-module_no:{
+module_id:{
 	type:Number,
 	required:true,
 	minlength:1
@@ -43,4 +46,6 @@ module_no:{
 
 
 });
+var modules = mongoose.model('modules',ModuleSchema);
+
 module.exports={modules};

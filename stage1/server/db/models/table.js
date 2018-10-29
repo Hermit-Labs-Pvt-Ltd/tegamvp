@@ -1,11 +1,13 @@
 const mongoose = require('mongoose');
-var table = mongoose.model('table',{
- cl_id:{
- 	type:String,
+var {Schema} = require('mongoose');
+// var Schema = mongoose.Schema;
+var TableSchema = new Schema({
+	cl_id:{
+ 	type:Schema.Types.ObjectId,
  	required:true,
  	trim:true,
  	minlength:1,
- 	unique:true
+ 	ref:'client'
  },
  tab_row:{
  	type:Number,
@@ -33,15 +35,14 @@ var table = mongoose.model('table',{
  	type:Number,
  	minlength:1
  },
- status:{
- 	type:String,
- 	minlength:1
-},
-tab_no:{
+tab_id:{
 	type:Number,
-	minlength:1
+	minlength:1,
+	required:true
 }
 
 
+
 });
+var table = mongoose.model('table',TableSchema);
 module.exports={table};

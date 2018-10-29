@@ -1,10 +1,12 @@
 const mongoose = require('mongoose');
-var client = mongoose.model('client',{
- no_tab:{
+
+var ClientSchema = new mongoose.Schema({
+cl_id:{
  	type:Number,
  	trim:true,
- 	minlength:1,
- 	default:null
+ 	minlength:true,
+ 	required:true,
+ 	unique:true
  },
  cl_info:{
  	type:String,
@@ -12,10 +14,30 @@ var client = mongoose.model('client',{
  	minlength:1,
  	default:null
  },
- status:{
+  cl_nam:{
+ 	type:String,
+ 	trim:true,
+ 	minlength:1,
+ 	default:null
+ },
+ mqtt_topic:{
  	type:String,
  	trim:true,
  	minlength:1
  }
 });
-module.exports={client};
+
+ClientSchema.methods.addnewclient = function () {
+ // var new_client = this;
+ return this.save.then(()=>{
+  return "Success in creating user";
+ });
+};
+
+ClientSchema.statics.findprevclients = function (){
+
+};
+
+var tegaclient = mongoose.model('client',ClientSchema);
+
+module.exports={tegaclient};
