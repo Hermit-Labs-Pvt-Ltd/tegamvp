@@ -168,10 +168,15 @@ app.post('/newmodule',(req,res)=>{
 
 
 
-//GET route configuration
+//GET Route when the website will be opened for the first time 
 app.get('/',(req,res)=>{
-res.send("Hello");
-console.log(req.body);
+	
+tegaclient.find().then((id)=>{
+ res.send(id);
+}).catch((err)=>{
+	res.send(err);
+});
+
 });
 
 //Setting up the socket server to use the SSL certificates
